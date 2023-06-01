@@ -1,28 +1,21 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import { nanoid } from 'nanoid';
 import PhoneBook from './Phonebook/Phonebook';
 import Contacts from './Contacts/Contacts';
 import { Base } from './App.styled';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
-class App extends Component {
-  state = {
-    contacts: [
-      { id: 'id-1', name: 'Rosie Simpson', number: '+380974591256' },
-      { id: 'id-2', name: 'Hermione Kline', number: '+380974438912' },
-      { id: 'id-3', name: 'Eden Clements', number: '+380936451779' },
-      { id: 'id-4', name: 'Annie Copeland', number: '+380982279126' },
-      { id: 'id-5', name: 'Alex Dubovyi', number: '+380631065900' },
-      { id: 'id-6', name: 'Ambulance', number: '101' },
-      { id: 'id-7', name: 'Police State', number: '102' },
-      { id: 'id-8', name: 'Pamela Anderson', number: '+380634567890' },
-    ],
-    filter: '',
-  };
+const App = () => {
+  const [contacts, setContacts] = useState(
+    () => JSON.parse(localStorage.getItem('contacts')) || []
+  );
+  const [filter, setFilter] = useState('');
 
-  handleAddContact = (name, number) => {
-    const { contacts } = this.state;
+  useEffect(() => {
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
 
+  const handleAddContact = (name, number) => {
     const existingContact = contacts.some(
       contact => contact.name.toLowerCase() === name.toLowerCase()
     );
@@ -38,49 +31,36 @@ class App extends Component {
       number: number,
     };
 
-    this.setState(prevState => ({
-      contacts: [...prevState.contacts, newContact],
-    }));
+    setContacts(prevContacts => [...prevContacts, newContact]);
   };
 
-  handleDeleteContact = userId => {
-    this.setState(prevState => {
-      return {
-        contacts: prevState.contacts.filter(contact => {
-          return contact.id !== userId;
-        }),
-      };
-    });
-  };
-
-  handleFilterChange = evt => {
-    this.setState({ filter: evt.target.value });
-  };
-
-  filterContacts = () => {
-    const { contacts, filter } = this.state;
-
-    return contacts.filter(contact =>
-      contact.name.toLowerCase().includes(filter.toLowerCase())
+  const handleDeleteContact = userId => {
+    setContacts(prevContacts =>
+      prevContacts.filter(contact => {
+        return contact.id !== userId;
+      })
     );
   };
 
-  render() {
-    const { filter } = this.state;
-    const filteredContacts = this.filterContacts();
+  const handleFilterChange = evt => {
+    setFilter(evt.target.value);
+  };
 
-    return (
-      <Base>
-        <PhoneBook handleAddContact={this.handleAddContact} />
-        <Contacts
-          filter={filter}
-          handleFilterChange={this.handleFilterChange}
-          filteredContacts={filteredContacts}
-          handleDeleteContact={this.handleDeleteContact}
-        />
-      </Base>
-    );
-  }
-}
+  const filteredContacts = contacts.filter(contact =>
+    contact.name.toLowerCase().includes(filter.toLocaleLowerCase())
+  );
+
+  return (
+    <Base>
+      <PhoneBook handleAddContact={handleAddContact} />
+      <Contacts
+        filter={filter}
+        handleFilterChange={handleFilterChange}
+        filteredContacts={filteredContacts}
+        handleDeleteContact={handleDeleteContact}
+      />
+    </Base>
+  );
+};
 
 export default App;

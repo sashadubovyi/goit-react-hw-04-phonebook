@@ -35,7 +35,13 @@ const ContactItem = ({ filteredContacts, handleDeleteContact }) => {
 };
 
 ContactItem.propTypes = {
-  filteredContacts: PropTypes.array.isRequired,
+  filteredContacts: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      number: PropTypes.string.isRequired,
+    })
+  ).isRequired,
   handleDeleteContact: PropTypes.func.isRequired,
 };
 
