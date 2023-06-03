@@ -42,6 +42,8 @@ const App = () => {
     );
   };
 
+  //
+
   const handleFilterChange = evt => {
     setFilter(evt.target.value);
   };
